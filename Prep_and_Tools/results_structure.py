@@ -137,7 +137,7 @@ def export_patient_list_to_excel(txt_paths, output_path):
 
     # Build data and styling frames
     df = pd.DataFrame(display_rows)
-    excel_path = os.path.join(output_path, "Patient_List.xlsx")
+    excel_path = os.path.join(output_path, "Patient_Progression_List.xlsx")
 
     progress_cols = [
         "PRE_NIfTI", "POST_NIfTI",

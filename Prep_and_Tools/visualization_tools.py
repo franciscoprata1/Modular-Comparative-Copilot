@@ -5,7 +5,7 @@ from skimage import exposure
 import pydicom
 
 
-def visualize_nifti_series(series_list, title_prefix="NIfTI Preview"):
+def visualize_nifti_series(series_list, title):
     """
     Visualizes each NIfTI file's mid-slice in axial, sagittal, and coronal planes.
     Skips corrupted or incompatible volumes without crashing.
@@ -25,7 +25,6 @@ def visualize_nifti_series(series_list, title_prefix="NIfTI Preview"):
             }
 
             fig, axes = plt.subplots(1, 3, figsize=(12, 4))
-            fig.suptitle(f"{title_prefix} {i + 1}: {os.path.basename(path)}", fontsize=14)
 
             for ax, (plane, (sl, aspect)) in zip(axes, views.items()):
                 sl = np.rot90(sl)
@@ -37,7 +36,7 @@ def visualize_nifti_series(series_list, title_prefix="NIfTI Preview"):
                 ax.set_title(plane)
                 ax.axis('off')
 
-            plt.title(f"NifTi preview: {os.path.basename(path)}")
+            plt.title(f"NifTi preview: {title} - {os.path.basename(path)}")
             plt.tight_layout()
             plt.show()
 
@@ -46,7 +45,7 @@ def visualize_nifti_series(series_list, title_prefix="NIfTI Preview"):
             continue
 
 
-def visualize_dicom_series(dicom_folder):
+def visualize_dicom_series(dicom_folder, title):
     """
     Loads and displays a representative mid-slice from a DICOM series.
     Robust against corrupted slices or inconsistent shape issues.
@@ -78,7 +77,7 @@ def visualize_dicom_series(dicom_folder):
 
         plt.figure(figsize=(5, 5))
         plt.imshow(mid_slice, cmap="gray")
-        plt.title(f"DICOM preview: {os.path.basename(dicom_folder)}")
+        plt.title(f"DICOM Preview: {title} - {os.path.basename(dicom_folder)}")
         plt.axis("off")
         plt.tight_layout()
         plt.show()

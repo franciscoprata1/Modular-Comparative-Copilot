@@ -18,7 +18,12 @@ def phase1_load_patients(main_output_path):
         if mode == "Batch":
             csv_path = input("Enter full path to CSV/Excel file: ").strip().strip('"')
             raw_path = input("Enter full path to raw data folder: ").strip().strip('"')
-            batch_patient_prep(csv_path, raw_path, main_output_path)
+            selection_mode = get_user_selection(
+                ["Automatic", "Manual"],
+                prompt="Select image selection mode:",
+                multi=False
+            )
+            batch_patient_prep(csv_path, raw_path, main_output_path, selection_mode)
 
         elif mode == "Individual":
             raw_path = input("Enter full path to raw data folder: ").strip().strip('"')
@@ -33,13 +38,7 @@ def phase1_load_patients(main_output_path):
                     raise ValueError(f"Invalid format: '{pair}' — must be like 'L2-L3'")
                 levels.extend(parts)
 
-            patient_dict = {
-                "patient_number": patient_id,
-                "case_type": case_type,
-                "levels": levels,
-                "folder_path": raw_path,  
-                "visits": {}
-            }
+            patient_dict = {"patient_number": patient_id, "case_type": case_type, "levels": levels, "folder_path": raw_path, "visits": {}}
 
             for vt in visit_types:
                 vt_path = os.path.join(raw_path, vt)
@@ -48,7 +47,13 @@ def phase1_load_patients(main_output_path):
                 else:
                     print(f"⚠️ Visit folder not found: {vt_path}")
 
-            individual_patient_prep(patient_dict, main_output_path)
+            selection_mode = get_user_selection(
+                ["Automatic", "Manual"],
+                prompt="Select image selection mode:",
+                multi=False
+            )
+
+            individual_patient_prep(patient_dict, main_output_path, selection_mode)
 
         elif mode == "Back to main":
             break

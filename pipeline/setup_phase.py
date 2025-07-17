@@ -93,20 +93,13 @@ def phase2_setup(txt_paths, main_output_path):
 
         elif action == "o":
             print(f"⚠️ Overwriting Patient {patient_id} analysis files.")
-            print("🧨 WARNING: This will DELETE all existing analysis files for this patient!")
-            confirm = input("❗ Are you sure you want to DELETE all existing analysis files? Type 'yes' to confirm: ").strip().lower()
-            if confirm == "yes":
-                print(f"🧨 Overwriting Patient {patient_id}")
-                try:
-                    existing = Patient.load_from_json(output_path, patient_id)
-                    clean_patient_analysis_files(existing)
-                except Exception as e:
-                    print(f"⚠️ Failed to clean previous analysis: {e}")
-                os.remove(json_path)
-                non_existing_paths.append(config_path)  # treat it like new patient
-            else:
-                print("❌ Overwrite cancelled. Skipping existing patients.")
-                action = "s"
+            try:
+                existing = Patient.load_from_json(output_path, patient_id)
+                clean_patient_analysis_files(existing)
+            except Exception as e:
+                print(f"⚠️ Failed to clean previous analysis: {e}")
+            os.remove(json_path)
+            non_existing_paths.append(config_path)  # treat it like new patient
 
         else:
             print(f"⚠️ Invalid action. Skipping Patient {patient_id}")

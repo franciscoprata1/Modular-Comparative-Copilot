@@ -2,6 +2,8 @@ import os
 import shutil
 import tempfile
 from nibabel import load
+import pydicom
+import nibabel as nib
 from Prep_and_Tools.io_tools import load_csv, copy_csv
 from Prep_and_Tools.patient_tools import extract_patient_info, organize_patient_files
 from Prep_and_Tools.results_structure import create_results_structure
@@ -10,17 +12,16 @@ from Prep_and_Tools.visualization_tools import visualize_nifti_series, visualize
 from Prep_and_Tools.imaging_tools import convert_dicom_to_nifti, list_all_series, automatic_image_selection
 
 
-def batch_patient_prep(csv_path, raw_data_path, output_path, keep_temp=False):
+def batch_patient_prep(csv_path, raw_data_path, output_path, image_selection_mode, keep_temp=False):
     print(f"🔍 Loading patient metadata from: {csv_path}")
     df = load_csv(csv_path)
     patients_info = extract_patient_info(df, raw_data_path)
 
     # Ask once how to select images (auto/manual)
-    use_auto = get_user_selection(
-        ["Automatic", "Manual"],
-        prompt="Batch Mode: How would you like to select the NIfTI/DICOM series?",
-        multi=False
-    ) == "Automatic"
+    if image_selection_mode == "Automatic":
+        use_auto = True
+    else:
+        use_auto = False
 
     temp_input_dir = tempfile.mkdtemp(prefix="InputStructure_")
     results_path = os.path.join(output_path, "Results")
@@ -118,7 +119,7 @@ def batch_patient_prep(csv_path, raw_data_path, output_path, keep_temp=False):
     return config_paths
 
 
-def individual_patient_prep(patient_dict, output_path, keep_temp=False):
+def individual_patient_prep(patient_dict, output_path, image_selection_mode,keep_temp=False):
 
     patient_id = patient_dict["patient_number"]
     case_type = patient_dict["case_type"]
@@ -140,12 +141,10 @@ def individual_patient_prep(patient_dict, output_path, keep_temp=False):
     input_base = os.path.join(temp_input_dir, f"PATIENT_{patient_id}")
     selected_niftis = {}
 
-    # Ask once how to select images (auto/manual)
-    use_auto = get_user_selection(
-        ["Automatic", "Manual"],
-        prompt="How would you like to select the NIfTI/DICOM series?",
-        multi=False
-    ) == "Automatic"
+    if image_selection_mode == "Automatic":
+        use_auto = True
+    else:
+        use_auto = False
 
     for visit_type in patient_dict["visits"]:
         sorted_path = os.path.join(input_base, visit_type, "SORTED")
